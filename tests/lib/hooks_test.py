@@ -34,6 +34,8 @@ import sys
 
 from collections import namedtuple
 
+from testing import on_fedora, on_travis_ci
+
 from vdsm.common import exception
 from vdsm.common import hooks
 
@@ -373,7 +375,9 @@ def env_dump(hooks_dir):
         {},
         {"abc": b"\xc4\x85b\xc4\x87".decode("utf-8")},
         {"abc": b"\xc4\x85b\xc4\x87".decode("utf-8")},
-        id="variable with local chars"
+        id="variable with local chars",
+        marks=pytest.mark.xfail(on_fedora(28) and on_travis_ci(),
+                                reason="broken on f28")
     ),
     pytest.param(
         {},
