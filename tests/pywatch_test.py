@@ -22,7 +22,6 @@ from __future__ import division
 
 import errno
 import os
-import re
 import signal
 import sys
 
@@ -31,11 +30,6 @@ import pytest
 from vdsm.common import cmdutils
 from vdsm.common import commands
 from vdsm.common.compat import subprocess
-
-
-def on_fedora():
-    with open("/etc/redhat-release") as f:
-        return re.search(r"Fedora release 2[89]", f.readline())
 
 
 def on_ovirt_ci():
@@ -59,7 +53,6 @@ class TestPyWatch(object):
         assert b'Terminating watched process' in e.value.out
         assert e.value.rc == 128 + signal.SIGTERM
 
-    @pytest.mark.xfail(on_fedora(), reason="py-bt is broken on Fedora")
     @pytest.mark.xfail(on_ovirt_ci(),
                        reason="py-bt randomly unavailable on EL7 nodes")
     def test_timeout_backtrace(self):
@@ -78,8 +71,8 @@ outer()
             commands.run([
                 sys.executable, 'py-watch', '0.1', sys.executable,
                 '-c', script])
-        assert b'in inner ()' in e.value.out
-        assert b'in outer ()' in e.value.out
+        assert b'line 8, in inner' in e.value.out
+        assert b'line 5, in outer' in e.value.out
 
     def test_kill_grandkids(self):
         # watch a bash process that starts a grandchild bash process.
