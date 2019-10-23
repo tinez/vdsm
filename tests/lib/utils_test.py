@@ -46,7 +46,7 @@ from fakelib import FakeLogger
 from testlib import forked, online_cpus
 from testlib import permutations, expandPermutations
 from testlib import VdsmTestCase as TestCaseBase
-from testValidation import brokentest
+from testValidation import brokentest, broken_on_ci
 
 EXT_SLEEP = "sleep"
 
@@ -260,6 +260,7 @@ class TestRetry(TestCaseBase):
 
 class TestGetCmdArgs(TestCaseBase):
 
+    @broken_on_ci("absolute path for 'sleep' returned", name="TRAVIS_CI")
     def test(self):
         args = [EXT_SLEEP, "4"]
         sproc = commands.start(args)
